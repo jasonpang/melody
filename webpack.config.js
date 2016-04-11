@@ -1,8 +1,9 @@
 var webpack = require("webpack");
 var path = require('path');
 var babelPolyfill = require('babel-polyfill');
-var IS_PROD = process.argv.indexOf('--production-build') >= 0;
-var IS_TEST = process.argv.indexOf('--test-build') >= 0;
+var IS_PROD = process.argv.indexOf('--production') >= 0;
+var IS_TEST = process.argv.indexOf('--test') >= 0;
+var IS_BETA = process.argv.indexOf('--beta') >= 0;
 
 Date.prototype.timeNow = function() {
     var hours = this.getHours();
@@ -12,11 +13,16 @@ Date.prototype.timeNow = function() {
     return ((hours < 10) ? "0" : "") + hours + ":" + ((this.getMinutes() < 10) ? "0" : "") + this.getMinutes() + ":" + ((this.getSeconds() < 10) ? "0" : "") + this.getSeconds() + " " + ampm;
 };
 
-var entries = {
-    bundle: './src/site.js'
-};
+var entries = { };
 
-var includePaths = [path.resolve(__dirname, "./src")];
+if (IS_TEST) {
+    entries.test = './test/entry.js';
+    var includePaths = [path.resolve(__dirname, "./src"),
+                        path.resolve(__dirname, "./test")];
+} else {
+    entries.bundle = './src/entry.js';
+    var includePaths = [path.resolve(__dirname, "./src")];
+}
 
 module.exports = {
     entry: entries,
@@ -32,7 +38,7 @@ module.exports = {
             exclude: /(node_modules|bower_components)/,
             loader: 'babel-loader',
             query: {
-                presets: ['react', 'es2015'],
+                presets: ['es2015'],
                 cacheDirectory: true
                    }
             },
@@ -54,8 +60,8 @@ module.exports = {
     },
     debug: !IS_PROD,
     plugins: [
-        new webpack.optimize.DedupePlugin(),
-        new webpack.optimize.AggressiveMergingPlugin(),
+        // new webpack.optimize.DedupePlugin(),
+        // new webpack.optimize.AggressiveMergingPlugin(),
         // new webpack.optimize.UglifyJsPlugin({
         //     sourceMap: true,
         //     compress: {
@@ -88,3 +94,7 @@ module.exports = {
             __VERSION__: JSON.stringify(require("./package.json").version),
         })]
 };
+
+if (IS_TEST) {
+    module.exports.output.path = path.join(__dirname, 'public/test');
+}

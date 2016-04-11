@@ -1,3 +1,6 @@
+import ControllerEvent from './ControllerEvent';
+
+
 export default class Track {
     constructor(song) {
         this.song = song;
@@ -10,6 +13,9 @@ export default class Track {
     }
 
     addControllerEvent(controller, time, value) {
+        if (!this.controllers[controller]) {
+            this.controllers[controller] = [];
+        }
         this.controllers[controller].push(new ControllerEvent(time, value));
     }
 
@@ -19,5 +25,9 @@ export default class Track {
 
     get notesCount() {
         return this.notes.length;
+    }
+
+    getNote(index) {
+        return this.notes[index];
     }
 }

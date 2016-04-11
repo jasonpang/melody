@@ -1,6 +1,7 @@
 import log from 'loglevel';
 import WebMidi from 'webmidi';
 import heir from 'heir';
+import EventEmitter from 'wolfy87-eventemitter';
 
 
 export default class Midi {
